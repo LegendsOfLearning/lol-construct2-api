@@ -31,4 +31,10 @@ that event. A phrase key missing from the dictionary returns its fallback and
 does not request speech. Register the keys and translations for the game
 version before relying on localized text or audio.
 
+**Has phrase** is true once the player supplies a key. For a dialogue event
+that runs every frame, combine it with Construct's **Trigger once while true**
+condition before using **Speak phrase**. This waits for the language data and
+avoids restarting the recording every frame. Use a separate explicit event for
+intentional replay.
+
 Since you are developing on a shared EC2 instance that is for C2 development the current files are already there.

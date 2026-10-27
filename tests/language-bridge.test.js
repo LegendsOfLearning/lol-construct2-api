@@ -38,8 +38,10 @@ function makeRuntime() {
 test('host language supplies translated text and selected-voice key', () => {
   const t = makeRuntime();
   assert.equal(t.phrase('greeting', 'Hello'), 'Hello');
+  assert.equal(t.plugin.cnds.HasPhrase.call(t.instance, 'greeting'), false);
   t.receive(t.parent, { messageName: 'language', payload: JSON.stringify({ language: 'es', greeting: 'Hola' }) });
   assert.equal(t.phrase('greeting', 'Hello'), 'Hola');
+  assert.equal(t.plugin.cnds.HasPhrase.call(t.instance, 'greeting'), true);
   assert.equal(t.triggers.length, 1);
   assert.equal(t.triggers[0].condition, t.plugin.cnds.OnLanguageReceived);
   t.plugin.acts.SpeakPhrase.call(t.instance, 'greeting');
@@ -78,15 +80,17 @@ test('Construct editor registers names implemented by the runtime', () => {
     AddAction: (...args) => registrations.push(['action', args.at(-1)]),
     AddExpression: (...args) => registrations.push(['expression', args.at(-2)]),
     AddStringParam() {}, AddNumberParam() {}, ACESDone() {},
-    cf_trigger: 1, af_none: 0, ef_return_string: 2, ept_integer: 0,
+    cf_trigger: 1, cf_none: 0, af_none: 0, ef_return_string: 2, ept_integer: 0,
     cr: { Property: function () {} },
   };
   const source = fs.readFileSync('plugins/lol-main/files/lol-main/edittime.js', 'utf8');
   vm.runInNewContext(source, context);
   assert.ok(registrations.some(([kind, name]) => kind === 'condition' && name === 'OnLanguageReceived'));
+  assert.ok(registrations.some(([kind, name]) => kind === 'condition' && name === 'HasPhrase'));
   assert.ok(registrations.some(([kind, name]) => kind === 'action' && name === 'SpeakPhrase'));
   assert.ok(registrations.some(([kind, name]) => kind === 'expression' && name === 'Phrase'));
   assert.equal(typeof t.plugin.cnds.OnLanguageReceived, 'function');
+  assert.equal(typeof t.plugin.cnds.HasPhrase, 'function');
   assert.equal(typeof t.plugin.acts.SpeakPhrase, 'function');
   assert.equal(typeof t.plugin.exps.Phrase, 'function');
 });

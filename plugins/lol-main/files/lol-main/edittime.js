@@ -43,6 +43,9 @@
 
 AddCondition(0, cf_trigger, "On language received", "Language",
 	"On language received", "Triggered when the player supplies translated text.", "OnLanguageReceived");
+AddStringParam("Key", "The translated phrase key.");
+AddCondition(1, cf_none, "Has phrase", "Language", "Has phrase {0}",
+	"True when the player has supplied text for this key.", "HasPhrase");
 
 ////////////////////////////////////////
 // Actions

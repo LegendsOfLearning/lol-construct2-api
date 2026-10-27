@@ -180,6 +180,9 @@ cr.plugins_.LoLMain = function(runtime)
 	// Conditions
 	function Cnds() {};
 	Cnds.prototype.OnLanguageReceived = function () { return true; };
+	Cnds.prototype.HasPhrase = function (key) {
+		return typeof key === "string" && Object.prototype.hasOwnProperty.call(this.language, key);
+	};
 
 	// ... other conditions here ...
 
