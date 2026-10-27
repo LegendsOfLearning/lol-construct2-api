@@ -27,9 +27,10 @@ need to store or synthesize a voice.
 
 The **On language received** condition fires when the player provides or
 updates the language dictionary. Refresh any dialogue already on screen in
-that event. A phrase key missing from the dictionary returns its fallback and
-does not request speech. Register the keys and translations for the game
-version before relying on localized text or audio.
+that event. A phrase key missing from the dictionary returns its fallback. A
+speech request for a missing key waits for a later language update containing
+that key; a newer request replaces it. Register the keys and translations for
+the game version before relying on localized text or audio.
 
 **Has phrase** is true once the player supplies a key. For a dialogue event
 that runs every frame, combine it with Construct's **Trigger once while true**
@@ -39,7 +40,7 @@ intentional replay.
 
 Use **Stop phrase** when the game closes or stops a spoken dialogue. Keep the
 game's existing effects and music controls in place; this action stops only
-the player's current spoken phrase.
+the player's current spoken phrase and clears a pending request.
 
 For a game with its own dialogue-volume slider, use **Set phrase volume**
 with the same decibel value as the Construct Audio action. This requires a

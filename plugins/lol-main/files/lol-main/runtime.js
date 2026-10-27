@@ -80,6 +80,7 @@ cr.plugins_.LoLMain = function(runtime)
 	{
 		theInstance = this;
 		this.language = Object.create(null);
+		this.pendingPhrase = null;
 		var self = this;
 		this.languageListener = function (event) {
 			if (event.source !== window.parent || !event.data || event.data.messageName !== "language") return;
@@ -93,6 +94,11 @@ cr.plugins_.LoLMain = function(runtime)
 				if (typeof payload[key] === "string") language[key] = payload[key];
 			});
 			self.language = language;
+			if (self.pendingPhrase && Object.prototype.hasOwnProperty.call(language, self.pendingPhrase)) {
+				var key = self.pendingPhrase;
+				self.pendingPhrase = null;
+				window.parent.postMessage({ message: "speakText", payload: { key: key } }, "*");
+			}
 			self.runtime.trigger(pluginProto.cnds.OnLanguageReceived, self);
 		};
 		window.addEventListener("message", this.languageListener);
@@ -105,6 +111,7 @@ cr.plugins_.LoLMain = function(runtime)
 	{
 		window.removeEventListener("message", this.languageListener);
 		this.languageListener = null;
+		this.pendingPhrase = null;
 	};
 
 	// called when saving the full state of the game
@@ -231,11 +238,17 @@ cr.plugins_.LoLMain = function(runtime)
 	}
 
 	Acts.prototype.SpeakPhrase = function (key) {
-		if (typeof key !== "string" || !Object.prototype.hasOwnProperty.call(this.language, key)) return;
+		if (typeof key !== "string" || !key) return;
+		if (!Object.prototype.hasOwnProperty.call(this.language, key)) {
+			this.pendingPhrase = key;
+			return;
+		}
+		this.pendingPhrase = null;
 		window.parent.postMessage({ message: "speakText", payload: { key: key } }, "*");
 	};
 
 	Acts.prototype.StopPhrase = function () {
+		this.pendingPhrase = null;
 		window.parent.postMessage({ message: "speakTextCancel" }, "*");
 	};
 

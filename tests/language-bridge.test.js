@@ -107,3 +107,22 @@ test('Construct editor registers names implemented by the runtime', () => {
   assert.equal(typeof t.plugin.acts.SetPhraseVolume, 'function');
   assert.equal(typeof t.plugin.exps.Phrase, 'function');
 });
+
+test('late language plays only the latest pending phrase and stop cancels pending speech', () => {
+  const t = makeRuntime();
+  t.plugin.acts.SpeakPhrase.call(t.instance, 'old');
+  t.plugin.acts.SpeakPhrase.call(t.instance, 'current');
+  assert.equal(t.messages.length, 0);
+  t.receive(t.parent, { messageName: 'language', payload: { old: 'Old', current: 'Current' } });
+  assert.equal(t.messages.length, 1);
+  assert.equal(t.messages[0].message.payload.key, 'current');
+  t.receive(t.parent, { messageName: 'language', payload: { current: 'Current' } });
+  assert.equal(t.messages.length, 1);
+
+  const stopped = makeRuntime();
+  stopped.plugin.acts.SpeakPhrase.call(stopped.instance, 'later');
+  stopped.plugin.acts.StopPhrase.call(stopped.instance);
+  stopped.receive(stopped.parent, { messageName: 'language', payload: { later: 'Later' } });
+  assert.equal(stopped.messages.length, 1);
+  assert.equal(stopped.messages[0].message.message, 'speakTextCancel');
+});
