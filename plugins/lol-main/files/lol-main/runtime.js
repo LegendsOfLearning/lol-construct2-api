@@ -79,6 +79,23 @@ cr.plugins_.LoLMain = function(runtime)
 	instanceProto.onCreate = function()
 	{
 		theInstance = this;
+		this.language = Object.create(null);
+		var self = this;
+		this.languageListener = function (event) {
+			if (event.source !== window.parent || !event.data || event.data.messageName !== "language") return;
+			var payload = event.data.payload;
+			if (typeof payload === "string") {
+				try { payload = JSON.parse(payload); } catch (_) { return; }
+			}
+			if (!payload || typeof payload !== "object" || Array.isArray(payload)) return;
+			var language = Object.create(null);
+			Object.keys(payload).forEach(function (key) {
+				if (typeof payload[key] === "string") language[key] = payload[key];
+			});
+			self.language = language;
+			self.runtime.trigger(pluginProto.cnds.OnLanguageReceived, self);
+		};
+		window.addEventListener("message", this.languageListener);
 	};
 
 	// called whenever an instance is destroyed
@@ -86,6 +103,8 @@ cr.plugins_.LoLMain = function(runtime)
 	// to release/recycle/reset any references to other objects in this function.
 	instanceProto.onDestroy = function ()
 	{
+		window.removeEventListener("message", this.languageListener);
+		this.languageListener = null;
 	};
 
 	// called when saving the full state of the game
@@ -160,6 +179,7 @@ cr.plugins_.LoLMain = function(runtime)
 	//////////////////////////////////////
 	// Conditions
 	function Cnds() {};
+	Cnds.prototype.OnLanguageReceived = function () { return true; };
 
 	// ... other conditions here ...
 
@@ -207,6 +227,11 @@ cr.plugins_.LoLMain = function(runtime)
 		window.LOLSDK.sendLoadingProgress(lp);
 	}
 
+	Acts.prototype.SpeakPhrase = function (key) {
+		if (typeof key !== "string" || !Object.prototype.hasOwnProperty.call(this.language, key)) return;
+		window.parent.postMessage({ message: "speakText", payload: { key: key } }, "*");
+	};
+
 	// ... other actions here ...
 
 	pluginProto.acts = new Acts();
@@ -214,6 +239,10 @@ cr.plugins_.LoLMain = function(runtime)
 	//////////////////////////////////////
 	// Expressions
 	function Exps() {};
+	Exps.prototype.Phrase = function (ret, key, fallback) {
+		var value = Object.prototype.hasOwnProperty.call(this.language, key) ? this.language[key] : fallback;
+		ret.set_string(typeof value === "string" ? value : "");
+	};
 
 	// the example expression
 
