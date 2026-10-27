@@ -41,7 +41,11 @@
 //				description,		// appears in event wizard dialog when selected
 //				script_name);		// corresponding runtime function name
 
-// example
+AddCondition(0, cf_trigger, "On language received", "Language",
+	"On language received", "Triggered when the player supplies translated text.", "OnLanguageReceived");
+AddStringParam("Key", "The translated phrase key.");
+AddCondition(1, cf_none, "Has phrase", "Language", "Has phrase {0}",
+	"True when the player has supplied text for this key.", "HasPhrase");
 
 ////////////////////////////////////////
 // Actions
@@ -77,6 +81,15 @@ AddAction(3, af_none, "Send Loading Progress", "Loading",
 	"Send a loading progress message to the LoL platform",
 	"SendLoadingProgress");
 
+AddStringParam("Key", "The translated phrase key to speak.");
+AddAction(4, af_none, "Speak phrase", "Language", "Speak phrase {0}",
+	"Ask the player to play the selected recording for a phrase.", "SpeakPhrase");
+AddAction(5, af_none, "Stop phrase", "Language", "Stop phrase",
+	"Ask the player to stop the current phrase recording.", "StopPhrase");
+AddNumberParam("Volume", "Dialogue volume in decibels; 0 is full volume.");
+AddAction(6, af_none, "Set phrase volume", "Language", "Set phrase volume to {0} dB",
+	"Set the volume for the player's selected-voice recordings.", "SetPhraseVolume");
+
 ////////////////////////////////////////
 // Expressions
 
@@ -88,7 +101,10 @@ AddAction(3, af_none, "Send Loading Progress", "Loading",
 //				 exp_name,		// the expression name after the dot, e.g. "foo" for "myobject.foo" - also the runtime function name
 //				 description);	// description in expressions panel
 
-// example
+AddStringParam("Key", "The translated phrase key.");
+AddStringParam("Fallback", "Text to use before language arrives or if the key is missing.");
+AddExpression(0, ef_return_string, "Phrase", "Language", "Phrase",
+	"Get translated text for a key, or the supplied fallback.");
 
 ////////////////////////////////////////
 ACESDone();
