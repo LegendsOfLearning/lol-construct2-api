@@ -235,6 +235,16 @@ cr.plugins_.LoLMain = function(runtime)
 		window.parent.postMessage({ message: "speakText", payload: { key: key } }, "*");
 	};
 
+	Acts.prototype.StopPhrase = function () {
+		window.parent.postMessage({ message: "speakTextCancel" }, "*");
+	};
+
+	Acts.prototype.SetPhraseVolume = function (decibels) {
+		if (typeof decibels !== "number" || (!isFinite(decibels) && decibels !== -Infinity)) return;
+		var volume = decibels === -Infinity ? 0 : Math.min(1, Math.pow(10, decibels / 20));
+		window.parent.postMessage({ message: "setSpeechVolume", payload: { volume: volume } }, "*");
+	};
+
 	// ... other actions here ...
 
 	pluginProto.acts = new Acts();

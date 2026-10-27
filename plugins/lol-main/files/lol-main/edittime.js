@@ -84,6 +84,11 @@ AddAction(3, af_none, "Send Loading Progress", "Loading",
 AddStringParam("Key", "The translated phrase key to speak.");
 AddAction(4, af_none, "Speak phrase", "Language", "Speak phrase {0}",
 	"Ask the player to play the selected recording for a phrase.", "SpeakPhrase");
+AddAction(5, af_none, "Stop phrase", "Language", "Stop phrase",
+	"Ask the player to stop the current phrase recording.", "StopPhrase");
+AddNumberParam("Volume", "Dialogue volume in decibels; 0 is full volume.");
+AddAction(6, af_none, "Set phrase volume", "Language", "Set phrase volume to {0} dB",
+	"Set the volume for the player's selected-voice recordings.", "SetPhraseVolume");
 
 ////////////////////////////////////////
 // Expressions

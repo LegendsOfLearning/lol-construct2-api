@@ -37,4 +37,13 @@ condition before using **Speak phrase**. This waits for the language data and
 avoids restarting the recording every frame. Use a separate explicit event for
 intentional replay.
 
+Use **Stop phrase** when the game closes or stops a spoken dialogue. Keep the
+game's existing effects and music controls in place; this action stops only
+the player's current spoken phrase.
+
+For a game with its own dialogue-volume slider, use **Set phrase volume**
+with the same decibel value as the Construct Audio action. This requires a
+player version that supports the `setSpeechVolume` message. It does not
+replace the player's global mute control.
+
 Since you are developing on a shared EC2 instance that is for C2 development the current files are already there.

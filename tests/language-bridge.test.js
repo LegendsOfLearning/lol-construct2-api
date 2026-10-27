@@ -46,6 +46,15 @@ test('host language supplies translated text and selected-voice key', () => {
   assert.equal(t.triggers[0].condition, t.plugin.cnds.OnLanguageReceived);
   t.plugin.acts.SpeakPhrase.call(t.instance, 'greeting');
   assert.equal(JSON.stringify(t.messages), JSON.stringify([{ message: { message: 'speakText', payload: { key: 'greeting' } }, target: '*' }]));
+  t.plugin.acts.StopPhrase.call(t.instance);
+  assert.equal(JSON.stringify(t.messages[1]), JSON.stringify({ message: { message: 'speakTextCancel' }, target: '*' }));
+  t.plugin.acts.SetPhraseVolume.call(t.instance, -20);
+  assert.equal(t.messages[2].message.message, 'setSpeechVolume');
+  assert.ok(Math.abs(t.messages[2].message.payload.volume - 0.1) < 1e-12);
+  t.plugin.acts.SetPhraseVolume.call(t.instance, -Infinity);
+  assert.equal(t.messages[3].message.payload.volume, 0);
+  t.plugin.acts.SetPhraseVolume.call(t.instance, NaN);
+  assert.equal(t.messages.length, 4);
 });
 
 test('unknown keys, malformed messages and other frames cannot cause speech', () => {
@@ -88,9 +97,13 @@ test('Construct editor registers names implemented by the runtime', () => {
   assert.ok(registrations.some(([kind, name]) => kind === 'condition' && name === 'OnLanguageReceived'));
   assert.ok(registrations.some(([kind, name]) => kind === 'condition' && name === 'HasPhrase'));
   assert.ok(registrations.some(([kind, name]) => kind === 'action' && name === 'SpeakPhrase'));
+  assert.ok(registrations.some(([kind, name]) => kind === 'action' && name === 'StopPhrase'));
+  assert.ok(registrations.some(([kind, name]) => kind === 'action' && name === 'SetPhraseVolume'));
   assert.ok(registrations.some(([kind, name]) => kind === 'expression' && name === 'Phrase'));
   assert.equal(typeof t.plugin.cnds.OnLanguageReceived, 'function');
   assert.equal(typeof t.plugin.cnds.HasPhrase, 'function');
   assert.equal(typeof t.plugin.acts.SpeakPhrase, 'function');
+  assert.equal(typeof t.plugin.acts.StopPhrase, 'function');
+  assert.equal(typeof t.plugin.acts.SetPhraseVolume, 'function');
   assert.equal(typeof t.plugin.exps.Phrase, 'function');
 });
