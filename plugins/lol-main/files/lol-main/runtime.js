@@ -249,7 +249,7 @@ cr.plugins_.LoLMain = function(runtime)
 
 	Acts.prototype.StopPhrase = function () {
 		this.pendingPhrase = null;
-		window.parent.postMessage({ message: "speakTextCancel" }, "*");
+		window.parent.postMessage({ message: "stopSelectedSpeech" }, "*");
 	};
 
 	Acts.prototype.SetPhraseVolume = function (decibels) {

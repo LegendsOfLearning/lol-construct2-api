@@ -47,7 +47,7 @@ test('host language supplies translated text and selected-voice key', () => {
   t.plugin.acts.SpeakPhrase.call(t.instance, 'greeting');
   assert.equal(JSON.stringify(t.messages), JSON.stringify([{ message: { message: 'speakText', payload: { key: 'greeting' } }, target: '*' }]));
   t.plugin.acts.StopPhrase.call(t.instance);
-  assert.equal(JSON.stringify(t.messages[1]), JSON.stringify({ message: { message: 'speakTextCancel' }, target: '*' }));
+  assert.equal(JSON.stringify(t.messages[1]), JSON.stringify({ message: { message: 'stopSelectedSpeech' }, target: '*' }));
   t.plugin.acts.SetPhraseVolume.call(t.instance, -20);
   assert.equal(t.messages[2].message.message, 'setSpeechVolume');
   assert.ok(Math.abs(t.messages[2].message.payload.volume - 0.1) < 1e-12);
@@ -124,5 +124,5 @@ test('late language plays only the latest pending phrase and stop cancels pendin
   stopped.plugin.acts.StopPhrase.call(stopped.instance);
   stopped.receive(stopped.parent, { messageName: 'language', payload: { later: 'Later' } });
   assert.equal(stopped.messages.length, 1);
-  assert.equal(stopped.messages[0].message.message, 'speakTextCancel');
+  assert.equal(stopped.messages[0].message.message, 'stopSelectedSpeech');
 });
